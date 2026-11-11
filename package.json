@@ -1,11 +1,12 @@
 {
-    "name": "akilandosi-site",
-    "version": "1.0.0",
-    "description": "Akilandosi website",
-    "scripts": {
-        "deploy": "gh-pages -d ."
-    },
-    "devDependencies": {
-        "gh-pages": "^6.1.1"
-    }
+  "name": "connect-community",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Responsive community website using Supabase backend",
+  "scripts": {
+    "deploy": "gh-pages -d ."
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
+  }
 }
