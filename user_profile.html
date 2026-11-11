@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Akilandosi - User Profile</title>
+    <meta name="description" content="Akilandosi User Profile" />
+    <style>
+        :root {
+            --accent: #1967d2;
+            --muted: #6b7280;
+            --bg: #0000ff
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+            line-height: 1.45;
+            margin: 0;
+            background: var(--bg) url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200&auto=format&fit=crop') repeat;
+            color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh
+        }
+
+        header {
+            background: linear-gradient(90deg, rgba(25, 103, 210, 0.08), transparent);
+            backdrop-filter: blur(2px);
+            padding: 18px 22px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.04)
+        }
+
+        .container {
+            max-width: 1050px;
+            padding: 0 20px
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            justify-content: space-between
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700
+        }
+
+        .logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px
+        }
+
+        nav a {
+            color: inherit;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 8px
+        }
+
+        .cta {
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px
+        }
+
+        .profile {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 36px;
+            padding: 44px 0
+        }
+
+        .main-profile {
+            display: flex;
+            flex-direction: column;
+            gap: 20px
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06)
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #999;
+            position: relative;
+            overflow: hidden
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .avatar-upload {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px
+        }
+
+        .profile-info h1 {
+            margin: 0;
+            font-size: 28px
+        }
+
+        .profile-info p {
+            margin: 4px 0;
+            color: var(--muted)
+        }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06)
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 20px
+        }
+
+        .social-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .social-links a {
+            display: inline-block;
+            padding: 8px 12px;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px
+        }
+
+        .skills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .skill {
+            background: #e6eef9;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px
+        }
+
+        .activity {
+            list-style: none;
+            padding: 0;
+            margin: 0
+        }
+
+        .activity li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0
+        }
+
+        .activity li:last-child {
+            border-bottom: none .card {
+                background: #fff;
+                border-radius: 12px;
+                padding: 18px;
+                box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06)
+            }
+
+            form label {
+                display: block;
+                font-size: 13px;
+                margin-bottom: 6px
+            }
+
+            input,
+            textarea {
+                width: 100%;
+                padding: 10px;
+                border-radius: 8px;
+                border: 1px solid #e6eef9
+            }
+
+            .foot {
+                padding: 20px 0;
+                color: var(--muted);
+                display: flex;
+                justify-content: space-between
+            }
+
+            @media (max-width:900px) {
+                .profile {
+                    grid-template-columns: 1fr
+                }
+            }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class=" container nav">
+            <div class="brand">
+                <div class="logo">AK</div>
+                <div>
+                    <div style="font-size:15px">Akilandosi</div>
+                    <div style="font-size:12px;color:var(--muted)">Creative . Simple . Local</div>
+                </div>
+            </div>
+            <nav>
+                <a href="akilandosi_site.html">Home</a>
+                <a href="login.html">Login</a>
+                <a href="user_profile.html">Profile</a>
+                <a href="settings.html">Settings</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="profile">
+            <div class="main-profile">
+                <div class="profile-header">
+                    <div class="avatar" id="avatar">
+                        <span>AU</span>
+                        <button class="avatar-upload"
+                            onclick="document.getElementById('avatarInput').click()">+</button>
+                        <input type="file" id="avatarInput" accept="image/*" style="display:none"
+                            onchange="uploadAvatar(event)">
+                    </div>
+                    <div class="profile-info">
+                        <h1 id="profileName">Akilandosi User</h1>
+                        <p id="profileEmail">akilandosi@gmail.com</p>
+                        <p id="profileLocation">Dar es Salaam, Tanzania</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Edit Profile</h2>
+                    <form onsubmit="handleProfileUpdate(event)">
+                        <label>Name</label><input type="text" id="nameInput" required>
+                        <label style="margin-top:10px">Email</label><input type="email" id="emailInput" required>
+                        <label style="margin-top:10px">Phone</label><input type="tel" id="phoneInput">
+                        <label style="margin-top:10px">Bio</label><textarea rows="4" id="bioInput"></textarea>
+                        <div style="margin-top:10px;display:flex;justify-content:flex-end">
+                            <button type="submit" class="cta">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="section">
+                    <h2>Social Links</h2>
+                    <div class="social-links">
+                        <a href="#" id="facebookLink">Facebook</a>
+                        <a href="#" id="twitterLink">Twitter</a>
+                        <a href="#" id="linkedinLink">LinkedIn</a>
+                        <a href="#" id="instagramLink">Instagram</a>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Connections</h2>
+                    <p>Connect with other users.</p>
+                    <input type="email" id="friendEmail" placeholder="Enter friend's email" style="margin-bottom:10px">
+                    <button onclick="addFriend()" class="cta" style="margin-right:10px">Add Friend</button>
+                    <div id="friendsList" class="skills" style="margin-top:10px"></div>
+                </div>
+
+                <div class="section">
+                    <h2>Messages</h2>
+                    <div id="messages"
+                        style="max-height:200px;overflow-y:auto;margin-bottom:10px;border:1px solid #e6eef9;padding:10px;border-radius:8px">
+                    </div>
+                    <input type="text" id="messageInput" placeholder="Type a message..."
+                        style="width:calc(100% - 60px);margin-right:10px">
+                    <button onclick="sendMessage()" class="cta">Send</button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="section">
+                    <h2>Recent Activity</h2>
+                    <ul class="activity">
+                        <li>Updated profile picture</li>
+                        <li>Added new skills</li>
+                        <li>Connected on LinkedIn</li>
+                        <li>Posted in gallery</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h2>Achievements</h2>
+                    <p>🏆 First Login</p>
+                    <p>🎨 Creative Designer</p>
+                    <p>💻 Code Master</p>
+                </div>
+
+                <div class="section">
+                    <h2>Quick Actions</h2>
+                    <a href="settings.html" class="cta" style="display:block;text-align:center;text-decoration:none">Go
+                        to Settings</a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="foot">
+            <div>@ <span id="year"></span> Akilandosi.</div>
+            <div class="muted">Built with care</div>
+        </footer>
+    </main>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Load user data
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            document.getElementById('nameInput').value = user.name || '';
+            document.getElementById('emailInput').value = user.email || '';
+            document.getElementById('phoneInput').value = user.phone || '';
+            document.getElementById('bioInput').value = user.bio || '';
+            document.getElementById('profileName').textContent = user.name || 'Akilandosi User';
+            document.getElementById('profileEmail').textContent = user.email || 'akilandosi@gmail.com';
+        }
+
+        // Load avatar from localStorage
+        const storedAvatar = localStorage.getItem('avatar');
+        if (storedAvatar) {
+            document.getElementById('avatar').innerHTML = `<img src="${storedAvatar}" alt="Avatar"><button class="avatar-upload" onclick="document.getElementById('avatarInput').click()">+</button><input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(event)">`;
+        }
+
+        function uploadAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgSrc = e.target.result;
+                    localStorage.setItem('avatar', imgSrc);
+                    document.getElementById('avatar').innerHTML = `<img src="${imgSrc}" alt="Avatar"><button class="avatar-upload" onclick="document.getElementById('avatarInput').click()">+</button><input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(event)">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Load friends
+        const friends = JSON.parse(localStorage.getItem('friends') || '[]');
+        updateFriendsList();
+
+        // Load messages
+        const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+        updateMessages();
+
+        function addFriend() {
+            const email = document.getElementById('friendEmail').value;
+            if (email && !friends.includes(email)) {
+                friends.push(email);
+                localStorage.setItem('friends', JSON.stringify(friends));
+                updateFriendsList();
+                document.getElementById('friendEmail').value = '';
+            }
+        }
+
+        function updateFriendsList() {
+            const list = document.getElementById('friendsList');
+            list.innerHTML = friends.map(f => `<span class="skill">${f}</span>`).join('');
+        }
+
+        function sendMessage() {
+            const text = document.getElementById('messageInput').value;
+            if (text) {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                messages.push({ user: user.name || 'Anonymous', text, time: new Date().toLocaleTimeString() });
+                localStorage.setItem('messages', JSON.stringify(messages));
+                updateMessages();
+                document.getElementById('messageInput').value = '';
+            }
+        }
+
+        function updateMessages() {
+            const container = document.getElementById('messages');
+            container.innerHTML = messages.map(m => `<p><strong>${m.user}:</strong> ${m.text} <small>(${m.time})</small></p>`).join('');
+        }
+    </script>
+</body>
+
+</html>

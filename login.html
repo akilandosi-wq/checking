@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Akilandosi - Login</title>
+    <meta name="description" content="Login to Akilandosi" />
+    <style>
+        :root {
+            --accent: #1967d2;
+            --muted: #6b7280;
+            --bg: #0000ff
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+            line-height: 1.45;
+            margin: 0;
+            background: var(--bg) url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200&auto=format&fit=crop') repeat;
+            color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh
+        }
+
+        header {
+            background: linear-gradient(90deg, rgba(25, 103, 210, 0.08), transparent);
+            backdrop-filter: blur(2px);
+            padding: 18px 22px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.04)
+        }
+
+        .container {
+            max-width: 1050px;
+            padding: 0 20px
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            justify-content: space-between
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700
+        }
+
+        .logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px
+        }
+
+        nav a {
+            color: inherit;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease
+        }
+
+        nav a:hover {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .cta {
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px;
+            transition: all 0.3s ease
+        }
+
+        .cta:hover {
+            background: #0d47a1;
+            transform: scale(1.05)
+        }
+
+        .login {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 44px 0
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+            width: 100%;
+            max-width: 400px
+        }
+
+        form label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e6eef9
+        }
+
+        .foot {
+            padding: 20px 0;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between
+        }
+
+        @media (max-width:560px) {
+            .brand {
+                gap: 8px
+            }
+
+            .logo {
+                width: 40px;
+                height: 40px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class=" container nav">
+            <div class="brand">
+                <div class="logo">AK</div>
+                <div>
+                    <div style="font-size:15px">Akilandosi</div>
+                    <div style="font-size:12px;color:var(--muted)">Creative . Simple . Local</div>
+                </div>
+            </div>
+            <nav>
+                <a href="akilandosi_site.html">Home</a>
+                <a href="login.html">Login</a>
+                <a href="user_profile.html">Profile</a>
+                <a href="settings.html">Settings</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="login">
+            <h1>Login to Akilandosi</h1>
+            <p class="muted" style="text-align:center;margin-bottom:20px">Enter your credentials to access your account.
+            </p>
+            <form class="card" onsubmit="handleLogin(event)">
+                <label>Email</label><input type="email" required>
+                <label style="margin-top:10px">Password</label><input type="password" required>
+                <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+                    <label><input type="checkbox"> Remember me</label>
+                    <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">Forgot password?</a>
+                </div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end">
+                    <button type="submit" class="cta">Login</button>
+                </div>
+            </form>
+            <p style="margin-top:20px;text-align:center">Don't have an account? <a href="akilandosi_site.html#signup"
+                    style="color:var(--accent)">Sign up here</a></p>
+        </section>
+
+        <footer class="foot">
+            <div>@ <span id="year"></span> Akilandosi.</div>
+            <div class="muted">Built with care</div>
+        </footer>
+    </main>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const form = event.target;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
+
+            if (!email || !password) {
+                alert('Please enter email and password.');
+                return;
+            }
+
+            // Check against stored user
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                if (user.email === email) {
+                    // For demo, assume password is correct (in real app, hash and check)
+                    alert('Login successful! Welcome back, ' + user.name + '.');
+                    // Redirect to profile or home
+                    window.location.href = 'user_profile.html';
+                } else {
+                    alert('Invalid email or password.');
+                }
+            } else {
+                alert('No account found. Please sign up first.');
+            }
+        }
+    </script>
+</body>
+
+</html>
