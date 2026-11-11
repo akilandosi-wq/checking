@@ -40,6 +40,7 @@
     if (!ready) {
       const setupHint = $("#backendHint");
       if (setupHint) setupHint.hidden = false;
+      notice("Backend is not connected yet. Complete the Supabase setup in README.md before creating an account or logging in.", true);
       return;
     }
     const { data: { session } } = await client.auth.getSession();
@@ -192,10 +193,9 @@
     $("#settingsEmail").textContent = session.user.email || "";
     try {
       const profile = await getProfile(session.user.id), prefs = profile.preferences || {};
-      $("#emailNotifications").checked = prefs.email_notifications !== false;
       $("#publicProfile").checked = prefs.public_profile !== false;
       const savePreferences = async () => {
-        const next = { email_notifications: $("#emailNotifications").checked, public_profile: $("#publicProfile").checked };
+        const next = { public_profile: $("#publicProfile").checked };
         const { error } = await client.from("profiles").update({ preferences: next, updated_at: new Date().toISOString() }).eq("id", session.user.id);
         if (error) showError(error); else notice("Preferences saved.");
       };
