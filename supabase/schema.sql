@@ -4,13 +4,13 @@ create table if not exists public.profiles (
   display_name text not null default 'Member' check (char_length(display_name) between 1 and 60),
   bio text not null default '' check (char_length(bio) <= 300),
   avatar_url text,
-  preferences jsonb not null default '{"email_notifications":true,"public_profile":true}'::jsonb,
+  preferences jsonb not null default '{"public_profile":true}'::jsonb,
   updated_at timestamptz not null default now()
 );
 
 create table if not exists public.messages (
   id bigint generated always as identity primary key,
-  user_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
   body text not null check (char_length(body) between 1 and 500),
   created_at timestamptz not null default now()
 );
@@ -25,7 +25,8 @@ revoke all on public.messages from anon;
 
 drop policy if exists "Signed-in users can view profiles" on public.profiles;
 create policy "Signed-in users can view profiles"
-on public.profiles for select to authenticated using (true);
+on public.profiles for select to authenticated
+using (auth.uid() = id or coalesce((preferences ->> 'public_profile')::boolean, true));
 
 drop policy if exists "Users create their own profile" on public.profiles;
 create policy "Users create their own profile"
