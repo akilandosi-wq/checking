@@ -1,186 +1,214 @@
-/* Akilandosi front-end demo helpers.
-   GitHub Pages is static hosting: data stays in this browser only.
-   Use a trusted backend before collecting real passwords or personal data. */
-(function () {
+(() => {
   "use strict";
-  const read = (key, fallback) => {
-    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
-    catch { return fallback; }
+  const config = window.SUPABASE_CONFIG || {};
+  const ready = Boolean(window.supabase && config.url && config.anonKey &&
+    !config.url.startsWith("YOUR_") && !config.anonKey.startsWith("YOUR_"));
+  const client = ready ? window.supabase.createClient(config.url, config.anonKey) : null;
+  const $ = (selector) => document.querySelector(selector);
+  const notice = (message, isError = false) => {
+    const box = $("#appNotice");
+    if (!box) { window.alert(message); return; }
+    box.textContent = message; box.hidden = false;
+    box.style.background = isError ? "#fff0ef" : "";
+    box.style.borderColor = isError ? "#f3c5c1" : "";
+    box.style.color = isError ? "#9b241c" : "";
   };
-  const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
-  const users = () => read("ak_users", {});
-  const currentEmail = () => localStorage.getItem("ak_session");
-  const currentUser = () => {
-    const all = users();
-    return all[currentEmail()] || null;
+  const requireBackend = () => {
+    if (ready) return true;
+    notice("Backend is not connected yet. Complete the Supabase setup in README.md and add the project keys.", true);
+    return false;
   };
-  const hash = async (value) => {
-    const bytes = new TextEncoder().encode(value);
-    const digest = await crypto.subtle.digest("SHA-256", bytes);
-    return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, "0")).join("");
+  const showError = (error) => notice(error?.message || "Something went wrong. Please try again.", true);
+  const setBusy = (form, busy) => {
+    const button = form?.querySelector('button[type="submit"]');
+    if (button) { button.disabled = busy; button.dataset.oldText ||= button.textContent; button.textContent = busy ? "Please wait…" : button.dataset.oldText; }
   };
-  const notice = (message) => {
-    const node = document.getElementById("appNotice");
-    if (node) { node.textContent = message; node.hidden = false; }
-    else alert(message);
-  };
-  const saveUser = (user) => {
-    const all = users();
-    all[user.email.toLowerCase()] = user;
-    write("ak_users", all);
-    write("user", user);
-  };
-
-  window.handleSignup = async function (event) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const data = Object.fromEntries(new FormData(form).entries());
-    const name = (data.name || "").trim();
-    const email = (data.email || "").trim().toLowerCase();
-    const password = data.password || "";
-    if (!name || !email || !data.dob || !data.address || !data.phone || !password) return notice("Please complete every field.");
-    if (password.length < 8) return notice("Use a password with at least 8 characters.");
-    if (password !== data.confirmPassword) return notice("The passwords do not match.");
-    const all = users();
-    if (all[email]) return notice("An account with this email already exists in this browser.");
-    all[email] = { name, email, dob: data.dob, address: data.address, phone: data.phone, passwordHash: await hash(password), bio: "" };
-    write("ak_users", all);
-    write("user", all[email]);
-    localStorage.setItem("ak_session", email);
-    notice("Account created on this browser. You are now signed in.");
-    form.reset();
-    setTimeout(() => { location.href = "user_profile.html"; }, 700);
+  const getProfile = async (userId) => {
+    const { data, error } = await client.from("profiles").select("*").eq("id", userId).single();
+    if (error) throw error;
+    return data;
   };
 
-  window.handleLogin = async function (event) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const email = form.querySelector('input[type="email"]').value.trim().toLowerCase();
-    const password = form.querySelector('input[type="password"]').value;
-    const user = users()[email];
-    if (!user || !user.passwordHash || (await hash(password)) !== user.passwordHash) {
-      return notice("Email or password is incorrect. Register again if this browser has no account.");
-    }
-    localStorage.setItem("ak_session", email);
-    write("user", user);
-    notice("Login successful. Opening your profile…");
-    setTimeout(() => { location.href = "user_profile.html"; }, 500);
-  };
-
-  window.handleProfileUpdate = function (event) {
-    event.preventDefault();
-    const user = currentUser() || read("user", null);
-    if (!user) return notice("Please register or log in first.");
-    user.name = document.getElementById("nameInput").value.trim();
-    user.email = document.getElementById("emailInput").value.trim().toLowerCase();
-    user.phone = document.getElementById("phoneInput").value.trim();
-    user.bio = document.getElementById("bioInput").value.trim();
-    const all = users();
-    if (currentEmail() && user.email !== currentEmail()) delete all[currentEmail()];
-    all[user.email] = user;
-    write("ak_users", all);
-    write("user", user);
-    localStorage.setItem("ak_session", user.email);
-    document.getElementById("profileName").textContent = user.name;
-    document.getElementById("profileEmail").textContent = user.email;
-    notice("Profile updated successfully.");
-  };
-
-  window.updateFriendsList = function () {
-    const list = document.getElementById("friendsList");
-    if (!list) return;
-    list.replaceChildren();
-    read("friends", []).forEach(email => {
-      const item = document.createElement("span");
-      item.className = "skill";
-      item.textContent = email;
-      list.appendChild(item);
-    });
-  };
-  window.updateMessages = function () {
-    const box = document.getElementById("messages");
-    if (!box) return;
-    box.replaceChildren();
-    read("messages", []).forEach(message => {
-      const line = document.createElement("p");
-      const sender = document.createElement("strong");
-      sender.textContent = message.user + ": ";
-      line.append(sender, document.createTextNode(message.text + " (" + message.time + ")"));
-      box.appendChild(line);
-    });
-  };
-  window.addFriend = function () {
-    const field = document.getElementById("friendEmail");
-    const email = field.value.trim().toLowerCase();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return notice("Enter a valid email address.");
-    const friends = read("friends", []);
-    if (friends.includes(email)) return notice("This email is already in your connections.");
-    friends.push(email); write("friends", friends); field.value = ""; updateFriendsList();
-  };
-  window.sendMessage = function () {
-    const field = document.getElementById("messageInput");
-    const message = field.value.trim();
-    if (!message) return;
-    const user = currentUser() || read("user", {});
-    const messages = read("messages", []);
-    messages.push({ user: user.name || "Guest", text: message.slice(0, 500), time: new Date().toLocaleString() });
-    write("messages", messages); field.value = ""; updateMessages();
-  };
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const year = document.getElementById("year");
+  async function init() {
+    const year = $("#year");
     if (year) year.textContent = new Date().getFullYear();
-    const noticeNode = document.createElement("p");
-    noticeNode.id = "appNotice"; noticeNode.className = "app-notice"; noticeNode.hidden = true;
-    const main = document.querySelector("main");
-    if (main) main.prepend(noticeNode);
-    const user = currentUser() || read("user", null);
-    if (user && document.getElementById("nameInput")) {
-      document.getElementById("nameInput").value = user.name || "";
-      document.getElementById("emailInput").value = user.email || "";
-      document.getElementById("phoneInput").value = user.phone || "";
-      document.getElementById("bioInput").value = user.bio || "";
-      document.getElementById("profileName").textContent = user.name || "Akilandosi User";
-      document.getElementById("profileEmail").textContent = user.email || "";
+    if (!$("#appNotice") && $("main")) {
+      const box = document.createElement("div");
+      box.id = "appNotice"; box.className = "notice"; box.hidden = true;
+      $("main").prepend(box);
     }
-    updateFriendsList(); updateMessages();
+    if (!ready) {
+      const setupHint = $("#backendHint");
+      if (setupHint) setupHint.hidden = false;
+      notice("Backend is not connected yet. Complete the Supabase setup in README.md before creating an account or logging in.", true);
+      return;
+    }
+    const { data: { session } } = await client.auth.getSession();
+    const page = document.body.dataset.page;
+    if (page === "register") bindRegister();
+    if (page === "login") bindLogin();
+    if (page === "profile") await initProfile(session);
+    if (page === "settings") await initSettings(session);
+    const logout = $("#logoutButton");
+    if (logout) logout.addEventListener("click", async () => {
+      const { error } = await client.auth.signOut();
+      if (error) return showError(error);
+      location.href = "index.html";
+    });
+  }
 
-    document.querySelectorAll(".setting input[type=checkbox]").forEach((input, index) => {
-      const key = "ak_setting_" + index;
-      const saved = localStorage.getItem(key);
-      if (saved !== null) input.checked = saved === "true";
-      input.addEventListener("change", () => localStorage.setItem(key, String(input.checked)));
+  function bindRegister() {
+    const form = $("#registerForm");
+    if (!form) return;
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!requireBackend()) return;
+      const data = new FormData(form);
+      const displayName = String(data.get("display_name") || "").trim();
+      const email = String(data.get("email") || "").trim().toLowerCase();
+      const password = String(data.get("password") || "");
+      const confirm = String(data.get("confirm_password") || "");
+      if (password.length < 8) return notice("Password must contain at least 8 characters.", true);
+      if (password !== confirm) return notice("Passwords do not match.", true);
+      setBusy(form, true);
+      try {
+        const { data: result, error } = await client.auth.signUp({ email, password, options: { data: { display_name: displayName } } });
+        if (error) throw error;
+        if (result.session) location.href = "user_profile.html";
+        else notice("Registration received. Check your email to confirm your account, then log in.");
+        form.reset();
+      } catch (error) { showError(error); }
+      finally { setBusy(form, false); }
     });
-    const buttons = Array.from(document.querySelectorAll("button"));
-    const change = buttons.find(button => /change password/i.test(button.textContent));
-    if (change) change.addEventListener("click", async () => {
-      const user = currentUser();
-      if (!user) return notice("Please log in first.");
-      const oldPassword = prompt("Enter your current password:");
-      if (oldPassword === null) return;
-      if ((await hash(oldPassword)) !== user.passwordHash) return notice("Current password is incorrect.");
-      const next = prompt("Enter a new password (at least 8 characters):");
-      if (!next || next.length < 8) return notice("Password must contain at least 8 characters.");
-      user.passwordHash = await hash(next); saveUser(user); notice("Password changed on this browser.");
+  }
+
+  function bindLogin() {
+    const form = $("#loginForm");
+    if (!form) return;
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!requireBackend()) return;
+      const data = new FormData(form); setBusy(form, true);
+      try {
+        const { error } = await client.auth.signInWithPassword({
+          email: String(data.get("email") || "").trim().toLowerCase(),
+          password: String(data.get("password") || "")
+        });
+        if (error) throw error;
+        location.href = "user_profile.html";
+      } catch (error) { showError(error); }
+      finally { setBusy(form, false); }
     });
-    const remove = buttons.find(button => /delete account/i.test(button.textContent));
-    if (remove) remove.addEventListener("click", () => {
-      const email = currentEmail();
-      if (!email) return notice("No signed-in account was found.");
-      if (!confirm("Delete this locally stored account and its profile?")) return;
-      const all = users(); delete all[email]; write("ak_users", all);
-      localStorage.removeItem("user"); localStorage.removeItem("ak_session");
-      localStorage.removeItem("avatar");
-      notice("Local account data deleted."); setTimeout(() => location.href = "index.html", 700);
-    });
-    const nav = document.querySelector("nav");
-    if (nav && currentEmail() && !nav.querySelector("[data-logout]")) {
-      const link = document.createElement("a");
-      link.href = "#"; link.textContent = "Logout"; link.dataset.logout = "true";
-      link.addEventListener("click", event => {
-        event.preventDefault(); localStorage.removeItem("ak_session"); location.href = "index.html";
+    $("#forgotPassword")?.addEventListener("click", async (event) => {
+      event.preventDefault();
+      if (!requireBackend()) return;
+      const email = String($("#loginEmail")?.value || "").trim().toLowerCase();
+      if (!email) return notice("Enter your email address first.", true);
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: location.origin + location.pathname.replace(/login\.html$/, "settings.html")
       });
-      nav.appendChild(link);
+      if (error) showError(error); else notice("If that email is registered, a password reset link has been sent.");
+    });
+  }
+
+  async function initProfile(session) {
+    if (!session) { location.href = "login.html"; return; }
+    try {
+      const profile = await getProfile(session.user.id);
+      $("#profileName").textContent = profile.display_name;
+      $("#profileBio").textContent = profile.bio || "Add a short introduction about yourself.";
+      $("#nameInput").value = profile.display_name || "";
+      $("#bioInput").value = profile.bio || "";
+      $("#profileEmail").textContent = session.user.email || "";
+      if (profile.avatar_url) $("#avatarImage").src = profile.avatar_url;
+      $("#profileForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const display_name = $("#nameInput").value.trim(), bio = $("#bioInput").value.trim();
+        if (!display_name) return notice("Display name is required.", true);
+        const { error } = await client.from("profiles").update({ display_name, bio, updated_at: new Date().toISOString() }).eq("id", session.user.id);
+        if (error) return showError(error);
+        $("#profileName").textContent = display_name;
+        $("#profileBio").textContent = bio || "Add a short introduction about yourself.";
+        notice("Profile saved.");
+      });
+      $("#avatarInput").addEventListener("change", async (event) => {
+        const file = event.target.files?.[0]; if (!file) return;
+        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 2 * 1024 * 1024)
+          return notice("Choose a JPG, PNG or WebP image under 2 MB.", true);
+        const path = session.user.id + "/" + Date.now() + "-" + file.name.replace(/[^a-zA-Z0-9._-]/g, "");
+        const { error: uploadError } = await client.storage.from("avatars").upload(path, file, { upsert: true, contentType: file.type });
+        if (uploadError) return showError(uploadError);
+        const { data } = client.storage.from("avatars").getPublicUrl(path);
+        const { error: saveError } = await client.from("profiles").update({ avatar_url: data.publicUrl }).eq("id", session.user.id);
+        if (saveError) return showError(saveError);
+        $("#avatarImage").src = data.publicUrl; notice("Profile photo updated.");
+      });
+      await loadMessages(session.user.id);
+      $("#messageForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const field = $("#messageInput"), body = field.value.trim();
+        if (!body || body.length > 500) return notice("Message must be between 1 and 500 characters.", true);
+        const button = $("#sendMessageButton"); button.disabled = true;
+        const { error } = await client.from("messages").insert({ user_id: session.user.id, body });
+        button.disabled = false;
+        if (error) return showError(error);
+        field.value = ""; await loadMessages(session.user.id); notice("Message posted.");
+      });
+    } catch (error) { showError(error); }
+  }
+
+  async function loadMessages(currentUserId) {
+    const { data, error } = await client.from("messages")
+      .select("id,user_id,body,created_at,profiles(display_name)")
+      .order("created_at", { ascending: false }).limit(40);
+    if (error) throw error;
+    const feed = $("#messageFeed"); feed.replaceChildren();
+    if (!data?.length) {
+      const empty = document.createElement("p"); empty.className = "muted small"; empty.textContent = "No messages yet. Start the conversation.";
+      feed.append(empty); return;
     }
-  });
+    data.forEach(item => {
+      const article = document.createElement("article"); article.className = "message";
+      const head = document.createElement("div"); head.className = "message-head";
+      const author = document.createElement("strong"); author.textContent = item.profiles?.display_name || "Member";
+      const date = document.createElement("time"); date.textContent = new Date(item.created_at).toLocaleString();
+      head.append(author, date);
+      const body = document.createElement("p"); body.textContent = item.body;
+      article.append(head, body);
+      if (item.user_id === currentUserId) {
+        const remove = document.createElement("button"); remove.type = "button"; remove.className = "secondary small"; remove.textContent = "Delete";
+        remove.addEventListener("click", async () => {
+          const { error: deleteError } = await client.from("messages").delete().eq("id", item.id);
+          if (deleteError) return showError(deleteError);
+          await loadMessages(currentUserId);
+        });
+        article.append(remove);
+      }
+      feed.append(article);
+    });
+  }
+
+  async function initSettings(session) {
+    if (!session) { location.href = "login.html"; return; }
+    $("#settingsEmail").textContent = session.user.email || "";
+    try {
+      const profile = await getProfile(session.user.id), prefs = profile.preferences || {};
+      $("#publicProfile").checked = prefs.public_profile !== false;
+      const savePreferences = async () => {
+        const next = { public_profile: $("#publicProfile").checked };
+        const { error } = await client.from("profiles").update({ preferences: next, updated_at: new Date().toISOString() }).eq("id", session.user.id);
+        if (error) showError(error); else notice("Preferences saved.");
+      };
+      $("#publicProfile").addEventListener("change", savePreferences);
+      $("#passwordForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const password = $("#newPassword").value;
+        if (password.length < 8) return notice("Use at least 8 characters for your password.", true);
+        const { error } = await client.auth.updateUser({ password });
+        if (error) return showError(error);
+        $("#passwordForm").reset(); notice("Password updated.");
+      });
+    } catch (error) { showError(error); }
+  }
+  document.addEventListener("DOMContentLoaded", () => { init().catch(showError); });
 })();
