@@ -199,7 +199,6 @@
         const { error } = await client.from("profiles").update({ preferences: next, updated_at: new Date().toISOString() }).eq("id", session.user.id);
         if (error) showError(error); else notice("Preferences saved.");
       };
-      $("#emailNotifications").addEventListener("change", savePreferences);
       $("#publicProfile").addEventListener("change", savePreferences);
       $("#passwordForm").addEventListener("submit", async (event) => {
         event.preventDefault();
