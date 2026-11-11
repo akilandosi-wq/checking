@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Account settings</title><link rel="stylesheet" href="styles.css"></head>
 <body data-page="settings"><header><div class="nav"><a class="brand" href="index.html">Connect</a><nav><a href="index.html">Home</a><a href="user_profile.html">Profile</a><a href="settings.html" aria-current="page">Settings</a><button id="logoutButton" class="secondary" type="button">Log out</button></nav></div></header>
-<main class="narrow"><div class="page-heading"><h1>Account settings</h1><p>Manage your sign-in and preferences.</p></div>
+<main class="narrow"><div class="page-heading"><h1>Account settings</h1><p>Manage your sign-in and privacy preferences.</p></div>
 <section class="card stack"><div><h2>Account</h2><p class="muted small" id="settingsEmail">Loading account…</p></div><form id="passwordForm"><label>New password<input id="newPassword" type="password" minlength="8" autocomplete="new-password" required></label><button type="submit">Update password</button></form></section>
-<section class="card"><h2>Preferences</h2><div class="setting-row"><label for="emailNotifications">Email notifications</label><input id="emailNotifications" type="checkbox"></div><div class="setting-row"><label for="publicProfile">Show profile to signed-in members</label><input id="publicProfile" type="checkbox"></div><p class="muted small">Preference controls are saved to your account.</p></section>
+<section class="card"><h2>Privacy</h2><div class="setting-row"><label for="publicProfile">Show profile to signed-in members</label><input id="publicProfile" type="checkbox"></div><p class="muted small">When turned off, other members cannot view your profile details.</p></section>
 </main><footer>Account settings</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="app.js"></script></body></html>
