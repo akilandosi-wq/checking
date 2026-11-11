@@ -21,7 +21,7 @@ The publishable/anon key is intended for browser use when Row Level Security is 
 
 ## 3. Configure email confirmation
 
-In Supabase **Authentication → URL Configuration**, add the GitHub Pages site URL to the allowed redirect URLs. Keep email confirmation enabled. If confirmation emails do not arrive, check the Auth email settings and spam folder.
+In Supabase **Authentication → URL Configuration**, add both `https://akilandosi-wq.github.io/checking/` and `https://akilandosi-wq.github.io/checking/**` to the allowed redirect URLs. Keep email confirmation enabled. If confirmation emails do not arrive, check the Auth email settings and spam folder.
 
 ## Features
 
