@@ -143,7 +143,27 @@
             }
         }
     </style>
-</head>
+<style id="akilandosi-overrides">
+:root{--bg:#f4f7fb}
+body{display:block;min-height:100vh;background:#f4f7fb;color:#172033}
+header{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);box-shadow:0 2px 14px rgba(15,23,42,.06)}
+.container{width:min(1100px,100%);margin:0 auto}
+nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+nav a{font-weight:600}
+nav a:hover{color:#fff}
+button,.cta{border:0;cursor:pointer;font:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+input,textarea{font:inherit;padding:12px;border:1px solid #dbe3ef;border-radius:9px;background:#fff}
+input:focus,textarea:focus{border-color:#1967d2;outline:none;box-shadow:0 0 0 3px rgba(25,103,210,.12)}
+.card,.feature,.section{border:1px solid #e8edf5;box-shadow:0 12px 32px rgba(15,23,42,.06)}
+.hero{padding:54px 0}
+.hero h1{font-size:clamp(30px,4vw,46px);line-height:1.12;color:#14213d}
+.buttons{flex-wrap:wrap}
+.buttons a{color:#1967d2;text-decoration:none;font-weight:600}
+.app-notice{padding:12px 16px;border-radius:10px;background:#eaf3ff;color:#164a8a;border:1px solid #cfe2ff}
+.foot{gap:12px;flex-wrap:wrap}
+@media(max-width:700px){header{padding:12px}.nav{align-items:flex-start;flex-direction:column}.nav nav{width:100%;gap:4px}.nav nav a{padding:8px}.hero{padding:32px 0}.buttons{display:grid;grid-template-columns:1fr}.profile{gap:18px;padding:24px 0}}
+</style>\n</head>
 
 <body>
     <header>
@@ -221,6 +241,6 @@
             }
         }
     </script>
-</body>
+  <script src="app.js"></script>\n</body>
 
 </html>
